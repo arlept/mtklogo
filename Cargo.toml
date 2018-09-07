@@ -1,0 +1,44 @@
+# see https://github.com/Haml-rs/haml-rs/blob/master/Cargo.toml
+# for a 'similar' tool (a CLI and a lib)
+[package]
+name = "mtklogo"
+version = "0.1.0"
+authors = ["arlept <arnaud@lepoint.net>"]
+# see https://spdx.org/licenses/
+license = "MIT OR Apache-2.0"
+description = "A Rust library for parsing MTK logo images."
+respository = "https://github.com/arlept/mtkimgrs"
+keywords= ["Android","MTK","Logo"]
+categories = ["development-tools"]
+readme = "README.md"
+maintenance = { status = "as-is" }
+
+[features]
+default = ["with-flate2"]
+with-libflate = ["libflate"]
+with-flate2 = ["flate2"]
+
+[lib]
+name = "mtklogo"
+path = "src/lib.rs"
+test = true
+
+[dependencies]
+# reading raw bytes little/big endian, etc.
+byteorder = "1.2.4"
+png = "0.12.0"
+
+# image decompression using pure rust implementation.
+# it's nice but does not support level 9 compression...
+# kept as an optional dependency if for some reason someone requires a "pure rust" program.
+[dependencies.libflate]
+version = "0.1.16"
+optional = true
+
+# zlib with 'miniz-sys' as a default backend.
+[dependencies.flate2]
+version = "1.0.2"
+optional = true
+
+[dev-dependencies]
+lazy_static ="1.0.2"

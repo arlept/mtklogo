@@ -1,0 +1,31 @@
+# see https://github.com/Haml-rs/haml-rs/blob/master/Cargo.toml
+# for a 'similar' tool (a CLI and a lib)
+[package]
+name = "mtklogo-cli"
+version = "0.1.0"
+authors = ["arlept <arnaud@lepoint.net>"]
+# see https://spdx.org/licenses/
+license = "MIT OR Apache-2.0"
+description = "A Rust library and CLIT tool for parsing MTK logo images."
+respository = "https://github.com/arlept/mtkimgrs"
+keywords= ["Android","MTK","Logo"]
+categories = ["command-line-utilities"]
+readme = "README.md"
+maintenance = { status = "as-is" }
+
+[[bin]]
+name = "mtklogo"
+path = "src/main.rs"
+
+[dependencies]
+mtklogo = {version = "0.1.0", path = "../"}
+# command line parsing
+clap = "2.32.0"
+# colored output
+ansi_term = "0.11.0"
+# configuration file parsing
+serde = "1.0"
+serde_derive = "1.0"
+serde_yaml = "0.7"
+
+

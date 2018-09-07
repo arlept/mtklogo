@@ -1,0 +1,158 @@
+# Just a marker in case the format changes.
+version: "1.0"
+# profiles
+profiles:
+  # Default profile is for "old" MTK devices.
+  # For a recent phone, maybe overriding the color_model will be enough.
+  # For a tablet, you may want to flip orientation.
+  - name: default
+    # supported color models are:
+    # - "RgbaBig" 32bits R,G,B,A Big Endian
+    #     4 bytes per pixel:
+    #     0|rrrrrrrr|gggggggg|bbbbbbbb|aaaaaaaa|3
+    #
+    # - "RgbaLittle" 32bits R,G,B,A Little Endian
+    #     4 bytes per pixel:
+    #     0|aaaaaaaa|bbbbbbbb|gggggggg|rrrrrrrr|3
+    #
+    # - "BgraBig" 32bits B,G,R,A Big Endian
+    #     4 bytes per pixel:
+    #     0|bbbbbbbb|gggggggg|rrrrrrrr|aaaaaaaa|3
+    #
+    # - "BgraLittle" 32bits B,G,R,A Little Endian
+    #     4 bytes per pixel:
+    #     0|aaaaaaaa|rrrrrrrr|gggggggg|bbbbbbbb|3
+    #
+    # - "Rgb565Big" (16bits: 5red, 6green, 5blue), Big Endian
+    #     2 bytes per pixel:
+    #     0|rrrrrggg|gggbbbbb|1
+    #
+    # - "Rgb565lLittle" (16bits: 5red, 6green, 5blue), Little Endian
+    #     2 bytes per pixel:
+    #     0|gggbbbbb|rrrrrggg|1 (OMG!)
+    #
+    # Phone makers may use other formats, they are not supported by this tool.
+    color_model: Rgb565Little
+    # supported formats
+    # `w` - is the image width in pixels
+    # `h` - is the image height in pixels
+    # `t` - is an optional text hint.
+    # Default orientation is 'portrait': logo's width is smaller than height.
+    # You can reverse orientation when unpacking using the `-flip` command line argument.
+    formats:
+      # Most credits goes to rom1nux - https://github.com/rom1nux/mtkimg
+      # who collected interesting data about many MTK devices.
+      # conflicting sizes (which have same l = w*h) were removed.
+      # orientation defaults to portrait.
+    - { h: 160, w: 120, t: "QQVGA" }
+    - { h: 240, w: 160, t: "HQVGA" }
+    - { h: 320, w: 240, t: "QVGA" }
+    - { h: 360, w: 240, t: "WQVGA" }
+    - { h: 376, w: 240, t: "WQVGA" }
+    - { h: 384, w: 240, t: "WQVGA" }
+    - { h: 400, w: 240, t: "WQVGA" }
+    - { h: 428, w: 240, t: "WQVGA" }
+    - { h: 432, w: 240, t: "WQVGA" }
+    - { h: 480, w: 270, t: "HVGA" }
+    - { h: 480, w: 272, t: "HVGA" }
+    - { h: 480, w: 320, t: "HVGA" }
+    - { h: 480, w: 360, t: "HVGA" }
+    - { h: 640, w: 480, t: "VGA" }
+    - { h: 640, w: 384, t: "WVGA" }
+    - { h: 720, w: 480, t: "WVGA" }
+    - { h: 768, w: 480, t: "WVGA" }
+    - { h: 800, w: 480, t: "WVGA" }
+    - { h: 848, w: 480, t: "WVGA" }
+    - { h: 852, w: 480, t: "WVGA" }
+    - { h: 853, w: 480, t: "WVGA" }
+    - { h: 854, w: 480, t: "FWVGA" }
+    - { h: 800, w: 600, t: "SVGA" }
+    - { h: 960, w: 640, t: "DVGA" }
+    - { h: 1024, w: 576, t: "WSVGA" }
+    - { h: 1024, w: 768, t: "XGA" }
+    - { h: 1152, w: 768, t: "WXGA" }
+    - { h: 1280, w: 768, t: "WXGA" }
+    - { h: 1280, w: 800, t: "WXGA" }
+    - { h: 1360, w: 768, t: "WXGA" }
+    - { h: 1366, w: 768, t: "FWXGA" }
+    - { h: 1152, w: 864, t: "XGA+" }
+    - { h: 1152, w: 900, t: "XGA+" }
+    - { h: 1152, w: 870, t: "XGA+" }
+    - { h: 1120, w: 832, t: "XGA+" }
+    - { h: 1440, w: 900, t: "WXGA+" }
+    - { h: 1440, w: 960, t: "WSXGA" }
+    - { h: 1280, w: 1024, t: "SXGA" }
+    - { h: 1280, w: 960, t: "SXGA-" }
+    - { h: 1400, w: 1050, t: "SXGA+" }
+    - { h: 1680, w: 1050, t: "WSXGA" }
+    - { h: 1600, w: 1200, t: "UXGA" }
+    - { h: 1920, w: 1200, t: "WUXGA" }
+    - { h: 2048, w: 1152, t: "QWXGA" }
+    - { h: 2048, w: 1536, t: "QXGA" }
+    - { h: 2560, w: 1600, t: "WQXGA" }
+    - { h: 2880, w: 1600, t: "WQXGA" }
+    - { h: 2560, w: 2048, t: "QSXGA" }
+    - { h: 3200, w: 2048, t: "WQSXGA" }
+    - { h: 3200, w: 2400, t: "QUXGA" }
+    - { h: 3840, w: 2400, t: "WQUXGA" }
+    - { h: 4096, w: 3072, t: "HXGA" }
+    - { h: 5120, w: 3200, t: "WHXGA" }
+    - { h: 5120, w: 4096, t: "HSXGA" }
+    - { h: 6400, w: 4096, t: "WHSXGA" }
+    - { h: 6400, w: 4800, t: "HUXGA" }
+    - { h: 7680, w: 4800, t: "WHUXGA" }
+    - { h: 640, w: 360, t: "nHD" }
+    - { h: 960, w: 540, t: "qHD" }
+    - { h: 1280, w: 720, t: "HD" }
+    - { h: 1600, w: 900, t: "HD+" }
+    - { h: 1920, w: 1080, t: "FHD" }
+    - { h: 2560, w: 1440, t: "QHD" }
+    - { h: 3200, w: 1800, t: "WQXGA+" }
+    - { h: 3840, w: 2160, t: "UHD" }
+    - { h: 5120, w: 2880, t: "UHD+" }
+    - { h: 7680, w: 4320, t: "FUHD" }
+    - { h: 15360, w: 8640, t: "QUHD" }
+    - { h: 54, w: 38, t: "MISC" }
+    - { h: 54, w: 48, t: "MISC" }
+    - { h: 24, w: 135, t: "MISC" }
+    - { h: 1, w: 135, t: "MISC" }
+
+  # You can edit your own profiles
+  # Here is an example for my phone.
+  # You can duplicate this block, give a new progile name,
+  # then fill the image dimensions you expect.
+  - name: lenovo_p1ma40
+    color_model: BgraBig
+    formats:
+    # full screen image - 3686400 bytes
+    - { w: 720, h: 1280 }
+    # symbols - 11520 bytes
+    - { w: 45, h: 64 }
+    # bigger symbols - 14592 bytes
+    - { w: 57, h: 64 }
+    # battery charge animation - 18908 bytes
+    - { w: 163, h: 29 }
+    # battery charge level (1 line repeat) - 652 bytes
+    - { w: 163, h: 1 }
+
+  # Another example for my previous phone.
+  - name: thl5000
+    color_model: Rgb565Little
+    formats:
+    # full screen image - 4147200 bytes
+    - { w: 1080, h: 1920 }
+    # small letter - 20328 bytes
+    - { w: 84, h: 121}
+    # charge animation - 31616 bytes
+    - { w: 304, h: 52}
+    # bigger letter (percent) - 26136 bytes
+    - { w: 108, h: 121}
+    # charge line - 608 bytes
+    - { w: 304, h: 1}
+
+  # Your profile here!
+  # - name: my_fantastic_phone
+  #   color_model: RgbaLittle
+  #   formats:
+  #   - { w: 2160, h: 3840 }
+  #   - ...

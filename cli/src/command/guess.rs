@@ -1,14 +1,11 @@
 use std::collections::HashMap;
 use std::fmt;
 use std::fmt::Display;
+use std::io::Result;
+use super::{cmd, emphasize1, data1, data2, data3};
 use super::mtklogo::ColorMode;
 
-extern crate ansi_term;
-
-use self::ansi_term::Colour::Blue;
-use self::ansi_term::Colour::Purple;
-
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 struct Factor {
     pub factor: usize,
     pub power: usize,
@@ -78,7 +75,7 @@ impl<'a> Display for Factors<'a> {
         for (i, f) in self.factors.iter().enumerate() {
             Display::fmt(f, format)?;
             if i < self.factors.len() - 1 {
-                write!(format, " * ")?;
+                write!(format, " x ")?;
             }
         }
         Ok(())
@@ -88,15 +85,18 @@ impl<'a> Display for Factors<'a> {
 impl Display for Factor {
     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
         match self.power {
-            0 => fmt.write_str("1"),
-            1 => fmt.write_fmt(format_args!("{:?}", self.factor)),
-            _ => fmt.write_fmt(format_args!("{:?}^{:?}", self.factor, self.power))
+            0 => fmt.write_fmt(format_args!("{}", data1(1))),
+            1 => fmt.write_fmt(format_args!("{}", data1(self.factor))),
+            _ => fmt.write_fmt(format_args!("{}^{}", data1(self.factor), data1(self.power)))
         }
     }
 }
 
 
-pub fn run_guess(size: usize) {
+pub fn run_guess(size: usize) -> Result<()> {
+    println!("{} possible dimensions of a {} bytes blob",
+             cmd("guess"),
+             data1(size));
     fn explore(available_factors: &Vec<Factor>, a_factors: Vec<Factor>, n: usize) {
         let sz = available_factors.len();
         // Takes a factor in the available factor bag.
@@ -115,9 +115,9 @@ pub fn run_guess(size: usize) {
                 let www = next_a.iter().fold(1 as usize, product);
                 // This is the second member of the solution.
                 let hhh = n / www;
-                let dimension = format!("{} x {}", www, hhh);
-                let explanation = format!("{} = ({}) * {}", n, Factors { factors: &next_a }, hhh);
-                println!("It could be {} ... {}", Blue.paint(dimension), Purple.paint(explanation));
+                println!("It could be {} x {}. Because {} = ({}) * {}.",
+                         data3(www), data3(hhh),
+                         data2(n), Factors { factors: &next_a }, data1(hhh));
                 // continues
                 explore(&next_available, next_a, n);
             }
@@ -125,17 +125,20 @@ pub fn run_guess(size: usize) {
     }
 
     // group color modes by bytes per pixels.
-    let mut table: HashMap<u32, Vec<ColorMode>> = HashMap::new();
+    let mut table: HashMap<u32, Vec<&ColorMode>> = HashMap::new();
     // Cowboy style, just for the pleasure to do it one line !
     ColorMode::enumerate().iter().for_each(
-        |mode| table.entry(mode.bytes_per_pixel()).or_insert_with(|| Vec::new()).push(mode.clone()));
+        |mode| table.entry(mode.bytes_per_pixel()).or_insert_with(|| Vec::new()).push(mode));
     // Guess dimensions for each bytes per pixel.
     for (bpp, modes) in table.iter() {
         let sz = size / (*bpp as usize);
         let factors = Factor::decompose(sz);
-        println!("if {} bytes per pixel (modes: {:?}), {} bytes is {} pixels and has following divisors: {}.",
-                 *bpp, modes, size, sz, Factors { factors: &factors });
+        let o:Vec<String> = modes.iter().map(|m| format!("{}", emphasize1(m))).collect();
+        let colored_list = o.join(",");
+        println!("if {} bytes per pixel (modes: {}), {} bytes is {} pixels and has following divisors: {}.",
+                 data1(*bpp), colored_list, data3(size), data2(sz), Factors { factors: &factors });
         // explores possible arrangements
         explore(&factors, Vec::new(), sz);
     }
+    Ok(())
 }

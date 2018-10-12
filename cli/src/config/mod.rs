@@ -1,55 +1,32 @@
 use serde_yaml;
 use std::convert::From;
 use std::env;
+use std::error::Error;
 use std::fs::File;
 use std::io::{Error as IOError, ErrorKind, Result};
 use std::path::{Path, PathBuf};
-use super::mtklogo::{ColorMode, Endian};
+use mtklogo::ColorMode;
 
-#[derive(Debug, Clone, Deserialize, Serialize)]
-/// It's exactly the same definition than ColorMode in the lib...
-/// but I did'nt want to force the 'serde_yaml' in the lib, so this little wrapper.
-pub enum ConfigColorMode {
-    RgbaBig,
-    RgbaLittle,
-    BgraBig,
-    BgraLittle,
-    Rgb565Big,
-    Rgb565Little,
-}
-
-impl ConfigColorMode {
-    pub fn to_mtk(&self) -> ColorMode {
-        match self {
-            &ConfigColorMode::RgbaBig => ColorMode::Rgba(Endian::Big),
-            &ConfigColorMode::RgbaLittle => ColorMode::Rgba(Endian::Little),
-            &ConfigColorMode::BgraBig => ColorMode::Bgra(Endian::Big),
-            &ConfigColorMode::BgraLittle => ColorMode::Bgra(Endian::Little),
-            &ConfigColorMode::Rgb565Big => ColorMode::Rgb565(Endian::Big),
-            &ConfigColorMode::Rgb565Little => ColorMode::Rgb565(Endian::Little),
-        }
-    }
-}
-
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Deserialize, Serialize)]
 pub struct Config {
     pub version: String,
     pub profiles: Vec<Profile>,
 }
 
-#[derive(Debug, Deserialize, Serialize, Clone)]
+#[derive(Deserialize, Serialize, Clone)]
 pub struct Profile {
     pub name: String,
-    pub color_model: ConfigColorMode,
+    pub color_model: String,
     pub formats: Vec<Format>,
 }
 
 impl Profile {
-    pub fn with_color_model(self, color_model: ConfigColorMode) -> Profile {
+    pub fn with_color_model(self, color_model: String) -> Profile {
         return Profile { name: self.name, color_model, formats: self.formats };
     }
     pub fn guess_format(&self, size: u32, flip: bool) -> Result<Format> {
-        let bpp = self.color_model.to_mtk().bytes_per_pixel();
+        let mtk_color_model = ColorMode::by_name(&self.color_model)?;
+        let bpp = mtk_color_model.bytes_per_pixel();
         let pixels = size / bpp;
         let o = self.formats.iter()
             .find(|f| f.w * f.h == pixels)
@@ -69,7 +46,7 @@ impl Profile {
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Deserialize, Serialize)]
 pub struct Format {
     pub w: u32,
     pub h: u32,
@@ -102,6 +79,7 @@ impl Config {
     fn config_path() -> Result<(PathBuf, File)> {
         // in home directory?
         let home_config = {
+            #[allow(deprecated)] // hey i'm fine with a basic 'env::$HOME' behaviour.
             let mut home = env::home_dir().ok_or(IOError::new(ErrorKind::NotFound, "No home directory."))?;
             home.push(".config");
             home.push(Self::RELATIVE_CONFIG);
@@ -132,7 +110,7 @@ impl Config {
         config.map_err(
             |e| IOError::new(ErrorKind::InvalidData,
                              format!(
-                                 "could not read config {:?} -> '{:?}'", path, e)))
+                                 "could not read config {} -> '{}'", path.display(), e.description())))
     }
 
     pub fn from_file(path: &Path) -> Result<Config> {

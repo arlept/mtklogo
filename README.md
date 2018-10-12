@@ -38,7 +38,7 @@ You have to extract and flash again your `logo.bin` partition for the changes to
 There are many ways to achieve this:
 
 * Using the SP Flash Tool program. This does not require you to root or alter the system of your device.
-It will probably void your warranty, though.
+It will probably void your warranty, though.is ppor
 * Using backup and restore of [TWRP](https://twrp.me).
 That alternative recovery program can fairly well backup and restore your `logo.bin` partition.
 * On a rooted device, you can tinker with the `/dev/...` blocks...
@@ -109,7 +109,7 @@ mtklogo unpack logo.bin
 Extracting all logos to `/tmp/logos`, assuming 32 bits Bgra, big endian, images:
 
 ```bash
-mtklogo unpack logo.bin -o /tmp/logos/ --mode BgraBig
+mtklogo unpack logo.bin -o /tmp/logos/ --mode bgrabe
 ```
 
 Extracting only first two logos to `/tmp/logos`, using a specified custom profile:
@@ -133,6 +133,9 @@ logo_000_bgrabe.png
 ```
 
 ".png" files are first encoded to device-specific format, then zipped. ".z" files are taken as-is.
+
+Edge case: the 'repack' command just takes the logo images in the order specified by the logo index.
+It won't complain if there is a missing, or duplicate index.
 
 Repack example:
 
@@ -195,7 +198,7 @@ It could be 199680 x 4 ... 798720 = (2^10 * 3 * 5 * 13) * 4
 
 This is the easiest way to build and run the tool.
 
-This is built using rust 1.28.0.
+This is built using rust 1.29.1.
 Once you've the rust and cargo [tool chain](https://rustup.rs/), just install it:
 
 ```bash
@@ -244,8 +247,11 @@ linker = "aarch64-linux-android-gcc"
 Then build, making sure to have the arm64 compiler toolchain in your PATH:
 
 ```bash
-export PATH=/opt/android/ndk/arm64/bin:$PATH
+NDK=/opt/android/ndk/arm64
+export PATH=$NDK/bin:$PATH
 cargo build --release --target=aarch64-linux-android
+# optional : make a smaller binary (removes symbols)
+$NDK/aarch64-linux-android/bin/strip target/aarch64-linux-android/release/mtklogo
 ```
 
 Time to test!
@@ -290,13 +296,12 @@ cat mylogo.bin > /dev/block/platform/mtk-msdc.0/11230000.msdc0/by-name/logo
 Things which need to be improved:
 
 * User messages
-  * Wording is poor, ansi colored output is under-exploited.
   * Have a verbose and a silent flag.
-* User errors
-  * I'm abusing unwrap. It's usable enough but error messages might be unreadable.
+  * Ability to turn off colored output (command line arg AND compilation feature)
 * Binary distribution. I understand some people may just want to change their
   logo and are not interested in building from source, so releasing windows executable
   is probably welcome. 
+  * try making the executable smaller, it's overweight for its purpose.
   
 
 ## Support

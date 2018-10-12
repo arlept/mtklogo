@@ -1,8 +1,8 @@
 extern crate byteorder;
 
 pub use mtk::{LogoImage, LogoTable, MtkHeader, MtkType, same_bytes};
-use std::fmt::{Debug, Display};
 use std::fmt;
+use std::fmt::Display;
 use std::io::{Error as IOError, ErrorKind, Result};
 
 // MTK Structures
@@ -10,14 +10,14 @@ pub mod mtk;
 // I/O Utilities (zlib, png)
 pub mod utils;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 /// Device may encode data in little or big endian.
 pub enum Endian {
     Little,
     Big,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 /// Supported color modes (how pixels are encoded).
 pub enum ColorMode {
     Rgba(Endian),
@@ -25,31 +25,39 @@ pub enum ColorMode {
     Rgb565(Endian),
 }
 
+static SUPPORTED_MODES: [(ColorMode, &str); 6] = [
+    (ColorMode::Rgba(Endian::Big), "rgbabe"),
+    (ColorMode::Rgba(Endian::Little), "rgbale"),
+    (ColorMode::Bgra(Endian::Big), "bgrabe"),
+    (ColorMode::Bgra(Endian::Little), "bgrale"),
+    (ColorMode::Rgb565(Endian::Big), "rgb565be"),
+    (ColorMode::Rgb565(Endian::Little), "rgb565le")];
+
 impl ColorMode {
     /// Lists all managed color modes.
-    pub fn enumerate() -> Vec<ColorMode> {
-        vec!(
-            ColorMode::Rgba(Endian::Big),
-            ColorMode::Rgba(Endian::Little),
-            ColorMode::Bgra(Endian::Big),
-            ColorMode::Bgra(Endian::Little),
-            ColorMode::Rgb565(Endian::Big),
-            ColorMode::Rgb565(Endian::Little))
+    pub fn enumerate<'a>() -> Vec<&'a ColorMode> {
+        // concision over performance...
+        SUPPORTED_MODES.iter().map(|(mode, _name)| mode).collect()
+    }
+    pub fn by_name<'a>(name: &str) -> Result<&'a ColorMode> {
+        // concision over performance...
+        SUPPORTED_MODES.iter()
+            .find(|(_, n)| name.eq(*n))
+            .map(|(mode, _)| mode)
+            .ok_or_else(|| IOError::new(
+                ErrorKind::InvalidInput, format!("{} is not a color mode", name)))
     }
 }
 
 impl Display for ColorMode {
     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
-        let str = match *self {
-            ColorMode::Rgba(Endian::Big) => "rgbabe",
-            ColorMode::Rgba(Endian::Little) => "rgbale",
-            ColorMode::Bgra(Endian::Big) => "bgrabe",
-            ColorMode::Bgra(Endian::Little) => "bgrale",
-            ColorMode::Rgb565(Endian::Big) => "rgb565be",
-            ColorMode::Rgb565(Endian::Little) => "rgb565le",
-        };
-        fmt.write_str(str)?;
-        Ok(())
+        // concision over performance...
+        match SUPPORTED_MODES.iter().find(|(mode, _)| mode.eq(self)) {
+            Some((_, name)) => {
+                fmt.write_str(name)
+            }
+            None => fmt.write_str("ColorMode?") // should be unreachable.
+        }
     }
 }
 
@@ -76,28 +84,12 @@ pub enum ContentType {
 impl ContentType {
     /// Given a file name, can we say which Content Type it is?
     pub fn from_name(name: &str) -> Option<Self> {
-        if name.ends_with("rgbabe.png") {
-            return Some(ContentType::PNG(ColorMode::Rgba(Endian::Big)));
+        match SUPPORTED_MODES.iter().find(|(_, mode_name)| {
+            name.ends_with(&format!("{}.png", mode_name))
+        }).map(|(mode, _)| mode.clone()) {
+            Some(mode) => Some(ContentType::PNG(mode)),
+            None => if name.ends_with("raw.z") { Some(ContentType::Z) } else { None }
         }
-        if name.ends_with("rgbale.png") {
-            return Some(ContentType::PNG(ColorMode::Rgba(Endian::Little)));
-        }
-        if name.ends_with("bgrabe.png") {
-            return Some(ContentType::PNG(ColorMode::Bgra(Endian::Big)));
-        }
-        if name.ends_with("bgrale.png") {
-            return Some(ContentType::PNG(ColorMode::Bgra(Endian::Little)));
-        }
-        if name.ends_with("rgb565be.png") {
-            return Some(ContentType::PNG(ColorMode::Rgb565(Endian::Big)));
-        }
-        if name.ends_with("rgb565le.png") {
-            return Some(ContentType::PNG(ColorMode::Rgb565(Endian::Little)));
-        }
-        if name.ends_with("raw.z") {
-            return Some(ContentType::Z);
-        }
-        None
     }
 }
 
@@ -129,19 +121,15 @@ impl FileInfo {
         // Extracting id in "xxx_id_yyy", as the 'middle' token in ['xxx', id, 'yyy']
         let id = tokens.get(1).map_or_else(
             // no middle token
-            || Err(IOError::new(ErrorKind::InvalidData, "cannot find '_id_' token")),
+            || Err(IOError::new(ErrorKind::InvalidInput, "cannot find '_id_' token")),
             |middle_id| Ok(middle_id)).and_then(|middle_id| middle_id.parse::<usize>().map_err(
-            |_| IOError::new(ErrorKind::InvalidData, "cannot parse '_id' token")))?;
+            |_| IOError::new(ErrorKind::InvalidInput, "cannot parse '_id' token")))?;
         if let Some(content_type) = ContentType::from_name(name) {
             Ok(FileInfo { id, content_type })
         } else {
-            Self::error(name)
+            Err(IOError::new(ErrorKind::InvalidInput,
+                             format!(
+                                 "file '{}' does not look like a .z or a supported png format", name)))
         }
-    }
-
-    fn error<T: Debug>(t: T) -> Result<FileInfo> {
-        Err(IOError::new(ErrorKind::InvalidData,
-                         format!(
-                             "file name '{:?}' does not look like a .z or a supported png format", t)))
     }
 }

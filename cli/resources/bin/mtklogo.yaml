@@ -7,32 +7,32 @@ profiles:
   # For a tablet, you may want to flip orientation.
   - name: default
     # supported color models are:
-    # - "RgbaBig" 32bits R,G,B,A Big Endian
+    # - "rgbabe" 32bits R,G,B,A Big Endian
     #     4 bytes per pixel:
     #     0|rrrrrrrr|gggggggg|bbbbbbbb|aaaaaaaa|3
     #
-    # - "RgbaLittle" 32bits R,G,B,A Little Endian
+    # - "rgbale" 32bits R,G,B,A Little Endian
     #     4 bytes per pixel:
     #     0|aaaaaaaa|bbbbbbbb|gggggggg|rrrrrrrr|3
     #
-    # - "BgraBig" 32bits B,G,R,A Big Endian
+    # - "bgrabe" 32bits B,G,R,A Big Endian
     #     4 bytes per pixel:
     #     0|bbbbbbbb|gggggggg|rrrrrrrr|aaaaaaaa|3
     #
-    # - "BgraLittle" 32bits B,G,R,A Little Endian
+    # - "bgrale" 32bits B,G,R,A Little Endian
     #     4 bytes per pixel:
     #     0|aaaaaaaa|rrrrrrrr|gggggggg|bbbbbbbb|3
     #
-    # - "Rgb565Big" (16bits: 5red, 6green, 5blue), Big Endian
+    # - "rgb565be" (16bits: 5red, 6green, 5blue), Big Endian
     #     2 bytes per pixel:
     #     0|rrrrrggg|gggbbbbb|1
     #
-    # - "Rgb565lLittle" (16bits: 5red, 6green, 5blue), Little Endian
+    # - "rgb565le" (16bits: 5red, 6green, 5blue), Little Endian
     #     2 bytes per pixel:
     #     0|gggbbbbb|rrrrrggg|1 (OMG!)
     #
     # Phone makers may use other formats, they are not supported by this tool.
-    color_model: Rgb565Little
+    color_model: rgb565le
     # supported formats
     # `w` - is the image width in pixels
     # `h` - is the image height in pixels
@@ -122,7 +122,7 @@ profiles:
   # You can duplicate this block, give a new progile name,
   # then fill the image dimensions you expect.
   - name: lenovo_p1ma40
-    color_model: BgraBig
+    color_model: bgrabe
     formats:
     # full screen image - 3686400 bytes
     - { w: 720, h: 1280 }
@@ -137,7 +137,7 @@ profiles:
 
   # Another example for my previous phone.
   - name: thl5000
-    color_model: Rgb565Little
+    color_model: rgb565le
     formats:
     # full screen image - 4147200 bytes
     - { w: 1080, h: 1920 }
@@ -152,7 +152,7 @@ profiles:
 
   # Your profile here!
   # - name: my_fantastic_phone
-  #   color_model: RgbaLittle
+  #   color_model: rgbale
   #   formats:
   #   - { w: 2160, h: 3840 }
   #   - ...

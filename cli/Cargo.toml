@@ -2,7 +2,7 @@
 # for a 'similar' tool (a CLI and a lib)
 [package]
 name = "mtklogo-cli"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["arlept <arnaud@lepoint.net>"]
 # see https://spdx.org/licenses/
 license = "MIT OR Apache-2.0"
@@ -18,7 +18,7 @@ name = "mtklogo"
 path = "src/main.rs"
 
 [dependencies]
-mtklogo = {version = "0.1.0", path = "../"}
+mtklogo = {version = "0.1.1", path = "../"}
 # command line parsing
 clap = "2.32.0"
 # colored output
@@ -28,4 +28,8 @@ serde = "1.0"
 serde_derive = "1.0"
 serde_yaml = "0.7"
 
-
+[profile.release]
+# tries reducing the binary size.
+# consider stripping the symbols after compilation.
+lto = true
+panic = 'abort'

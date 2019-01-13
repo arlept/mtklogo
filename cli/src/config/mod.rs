@@ -17,12 +17,13 @@ pub struct Config {
 pub struct Profile {
     pub name: String,
     pub color_model: String,
+    pub alias: Option<Vec<String>>,
     pub formats: Vec<Format>,
 }
 
 impl Profile {
     pub fn with_color_model(self, color_model: String) -> Profile {
-        return Profile { name: self.name, color_model, formats: self.formats };
+        return Profile { name: self.name, color_model, alias: self.alias, formats: self.formats };
     }
     pub fn guess_format(&self, size: u32, flip: bool) -> Result<Format> {
         let mtk_color_model = ColorMode::by_name(&self.color_model)?;

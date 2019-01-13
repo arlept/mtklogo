@@ -1,3 +1,4 @@
+use Profile;
 use std::error::Error;
 use std::fs::File;
 use std::io::{BufReader, BufWriter, Error as IOError, ErrorKind, Result, Write};
@@ -10,9 +11,22 @@ use super::super::config::{Config, Format};
 pub fn run_unpack(config: Config, slots: Option<Vec<usize>>, profile_name: &str,
                   mode: Option<&str>, flip: bool, zip: bool, check: bool,
                   path: PathBuf, output: PathBuf) -> Result<()> {
+    /// does profile have this name or this alias?
+    fn match_name_or_alias(profile: &Profile, name: &str) -> bool {
+        if profile.name.eq(name) {
+            true
+        } else {
+            match profile.alias {
+                None => false,
+                Some(ref aliases) => aliases.contains(&name.to_string())
+            }
+        }
+    }
     // What is active profile?
     let maybe_profile =
-        config.profiles.iter().find(|i| { i.name.eq(&profile_name) });
+        config.profiles.iter().find(|profile|
+            match_name_or_alias(profile, profile_name)
+        );
     let mut profile = match maybe_profile {
         Some(p) => Ok(p.clone()),
         None => Err(IOError::new(ErrorKind::InvalidData,

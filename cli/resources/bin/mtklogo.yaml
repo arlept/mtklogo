@@ -1,5 +1,5 @@
 # Just a marker in case the format changes.
-version: "1.0"
+version: "1.1"
 # profiles
 profiles:
   # Default profile is for "old" MTK devices.
@@ -121,8 +121,12 @@ profiles:
   # Here is an example for my phone.
   # You can duplicate this block, give a new progile name,
   # then fill the image dimensions you expect.
-  - name: lenovo_p1ma40
+  - name: generic_mt6337t
     color_model: bgrabe
+    # a profile may fit many phones, so you can give it an "alias".
+    alias:
+    - condor_p8_lite_pgn610
+    - lenovo_p1ma40
     formats:
     # full screen image - 3686400 bytes
     - { w: 720, h: 1280 }

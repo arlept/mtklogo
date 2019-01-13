@@ -2,7 +2,7 @@
 # for a 'similar' tool (a CLI and a lib)
 [package]
 name = "mtklogo-cli"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["arlept <arnaud@lepoint.net>"]
 # see https://spdx.org/licenses/
 license = "MIT OR Apache-2.0"
@@ -18,14 +18,14 @@ name = "mtklogo"
 path = "src/main.rs"
 
 [dependencies]
-mtklogo = {version = "0.1.1", path = "../"}
+mtklogo = {version = "0.1.2", path = "../"}
 # command line parsing
 clap = "2.32.0"
 # colored output
 ansi_term = "0.11.0"
 # configuration file parsing
-serde = "1.0"
-serde_derive = "1.0"
+serde = "1.0.84"
+serde_derive = "1.0.84"
 serde_yaml = "0.7"
 
 [profile.release]

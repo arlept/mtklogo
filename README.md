@@ -198,13 +198,13 @@ It could be 199680 x 4 ... 798720 = (2^10 * 3 * 5 * 13) * 4
 
 This is the easiest way to build and run the tool.
 
-This is built using rust 1.29.1.
+This is built using rust 1.31.1.
 Once you've the rust and cargo [tool chain](https://rustup.rs/), just install it:
 
 ```bash
 # install it using cargo
 cd cli
-cargo install
+cargo install --path .
 # copy the sample configuration to your home directory
 cp resources/bin/mtklogo.yaml ~/.config 
 ```

@@ -1,6 +1,6 @@
 use byteorder::{BigEndian, LittleEndian, ReadBytesExt, WriteBytesExt};
 use std::io::{BufWriter, Error as IOError, ErrorKind, Read, Result, Write};
-use super::starts_with_bytes;
+use super::StartExt;
 
 #[derive(Copy, Clone, Debug)]
 /// An MTK image header.
@@ -20,10 +20,10 @@ pub enum MtkType {
 impl MtkType {
     /// Tests whether the specified "magic bytes" correspond to some possible mtk image type.
     fn from_bytes(bytes: &[u8]) -> Option<MtkType>{
-        if starts_with_bytes("RECOVERY".as_bytes(), bytes) {return Some(MtkType::RECOVERY)}
-        if starts_with_bytes("ROOTFS".as_bytes(), bytes) {return Some(MtkType::ROOTFS)}
-        if starts_with_bytes("KERNEL".as_bytes(), bytes) {return Some(MtkType::KERNEL)}
-        if starts_with_bytes("LOGO".as_bytes(), bytes) {return Some(MtkType::LOGO)}
+        if bytes.starts_with_ascii_ignore_case("RECOVERY".as_bytes()) {return Some(MtkType::RECOVERY)}
+        if bytes.starts_with_ascii_ignore_case( "ROOTFS".as_bytes()) {return Some(MtkType::ROOTFS)}
+        if bytes.starts_with_ascii_ignore_case( "KERNEL".as_bytes()) {return Some(MtkType::KERNEL)}
+        if bytes.starts_with_ascii_ignore_case( "LOGO".as_bytes()) {return Some(MtkType::LOGO)}
         None
     }
 }
@@ -49,14 +49,7 @@ impl MtkHeader {
 
         let mut remainder = [0 as u8; 472];
         reader.read_exact(&mut remainder)?;
-        // Checking the remainder is filled
-        for i in 0..(remainder.len()) {
-            if remainder[i] != 0xFF {
-                return Err(IOError::new(
-                    ErrorKind::InvalidData,
-                    "unused zone not filled, probably not an mtk header"));
-            }
-        }
+        // Change: don't check the remainder is filled with 0xFF (it's not always the case).
         Ok(MtkHeader { size, mtk_type })
     }
 

@@ -1,6 +1,6 @@
 extern crate byteorder;
 
-pub use mtk::{LogoImage, LogoTable, MtkHeader, MtkType, same_bytes};
+pub use mtk::{LogoImage, LogoTable, MtkHeader, MtkType};
 use std::fmt;
 use std::fmt::Display;
 use std::io::{Error as IOError, ErrorKind, Result};

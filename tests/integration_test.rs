@@ -8,7 +8,7 @@ extern crate mtklogo;
 // - if I'm not too bad with image formats...
 
 use byteorder::{ByteOrder, LittleEndian, BigEndian, ReadBytesExt};
-use mtklogo::{LogoImage, same_bytes};
+use mtklogo::{LogoImage};
 use mtklogo::utils::{image, load_raw};
 use mtklogo::utils::z_lib;
 use std::fs::File;
@@ -124,7 +124,7 @@ fn zlib_is_quite_symetric() {
     #[cfg(feature = "flate2")]
     let more_tests = || -> () {
         // With flate2, since it wraps the system zlib, it must be the exact same bytes!
-        assert!(same_bytes(blob1, &recompressed));
+        assert!(blob1.eq(&recompressed));
     };
     #[cfg(feature = "libflate")]
     let more_tests = || -> () {
@@ -159,5 +159,5 @@ fn png_is_not_lossy() {
     assert_eq!(h, hh);
 
     // Hopefully: decode(encode(x)) = x...
-    assert!(same_bytes(&raster, &raster_again));
+    assert!(&raster.eq(&raster_again));
 }

@@ -46,7 +46,7 @@ fn wrapped_main() -> IOResult<()> {
         .validator(is_existing_file);
 
     let prg = App::new("mtklogo")
-        .version("0.1.1")
+        .version("0.1.2")
         .author("arlept, arnaud@lepoint.net")
         .about("Yet another Android Logo Customizer for MTK devices!\nIt packs or repacks images from an MTK `logo.bin` file.")
         .subcommand(SubCommand::with_name("unpack")
